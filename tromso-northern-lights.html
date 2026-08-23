@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tromsø, together?</title>
+<style>
+  :root{
+    --night: #050914;
+    --night-2: #0a1428;
+    --aurora-green: #4ce0a1;
+    --aurora-teal: #35c4c9;
+    --aurora-violet: #8a6fe8;
+    --snow: #eef3fb;
+    --gold: #f2c46d;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    height:100%;
+    background: var(--night);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    overflow:hidden;
+    color: var(--snow);
+  }
+  body{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ---- Sky ---- */
+  #sky{
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, var(--night-2) 0%, var(--night) 65%);
+    z-index: 0;
+  }
+  .star{
+    position:absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: twinkle ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity: 0.2; }
+    50%{ opacity: 0.9; }
+  }
+
+  /* ---- Aurora ---- */
+  .aurora{
+    position: fixed;
+    left: -20%;
+    width: 140%;
+    height: 60vh;
+    top: 0;
+    filter: blur(40px);
+    mix-blend-mode: screen;
+    opacity: 0.55;
+    border-radius: 50%;
+    animation: drift 14s ease-in-out infinite;
+  }
+  .aurora.a1{
+    background: radial-gradient(ellipse at 30% 20%, var(--aurora-green), transparent 60%);
+    animation-delay: 0s;
+  }
+  .aurora.a2{
+    background: radial-gradient(ellipse at 65% 10%, var(--aurora-teal), transparent 60%);
+    animation-delay: -4s;
+    animation-duration: 18s;
+  }
+  .aurora.a3{
+    background: radial-gradient(ellipse at 50% 30%, var(--aurora-violet), transparent 65%);
+    animation-delay: -8s;
+    animation-duration: 22s;
+  }
+  @keyframes drift{
+    0%{ transform: translateX(-4%) translateY(0) scaleY(1); }
+    50%{ transform: translateX(4%) translateY(3%) scaleY(1.15); }
+    100%{ transform: translateX(-4%) translateY(0) scaleY(1); }
+  }
+
+  /* ---- Mountains ---- */
+  #mountains{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 26vh;
+    z-index: 1;
+  }
+
+  /* ---- Card ---- */
+  .card{
+    position: relative;
+    z-index: 3;
+    text-align:center;
+    padding: 2.5rem 3rem;
+    max-width: 90vw;
+  }
+  .eyebrow{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--gold);
+    margin-bottom: 0.9rem;
+  }
+  h1{
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.18;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--snow);
+    text-shadow: 0 0 30px rgba(76,224,161,0.25);
+  }
+  p.sub{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #b8c2d6;
+    font-size: 1.02rem;
+    margin: 0 auto 2.6rem auto;
+    max-width: 30rem;
+    line-height: 1.5;
+  }
+  .buttons{
+    position: relative;
+    height: 120px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 1.2rem;
+  }
+  button{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.15s ease, background 0.2s ease, font-size 0.2s ease, box-shadow .2s ease;
+  }
+  #yes{
+    background: linear-gradient(135deg, var(--aurora-green), var(--aurora-teal));
+    color: #04241c;
+    padding: 1rem 2.2rem;
+    font-size: 1.1rem;
+    box-shadow: 0 8px 26px rgba(76,224,161,0.35);
+  }
+  #yes:hover{
+    transform: scale(1.08);
+    box-shadow: 0 10px 32px rgba(76,224,161,0.55);
+  }
+  #no{
+    background: transparent;
+    color: #93a0b8;
+    border: 1.5px solid #3a4761;
+    padding: 1rem 1.8rem;
+    font-size: 1rem;
+    position: fixed;
+  }
+  #caption{
+    margin-top: 1.6rem;
+    min-height: 1.4rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+  }
+  .result{ display:none; }
+  .result.show{
+    display:block;
+    animation: pop 0.5s ease;
+  }
+  .result h1{ font-size: clamp(2.2rem, 7vw, 4rem); }
+  @keyframes pop{
+    0%{ transform: scale(0.7); opacity:0; }
+    60%{ transform: scale(1.05); opacity:1;}
+    100%{ transform: scale(1); }
+  }
+  .ask{ transition: opacity .3s ease; }
+  .ask.hide{ opacity:0; pointer-events:none; }
+
+  .spark{
+    position: fixed;
+    top: -5%;
+    font-size: 1.3rem;
+    opacity: 0.9;
+    animation: fall linear forwards;
+    z-index: 4;
+  }
+  @keyframes fall{
+    to{ transform: translateY(110vh) rotate(360deg); opacity: 0.15; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="sky"></div>
+  <div class="aurora a1"></div>
+  <div class="aurora a2"></div>
+  <div class="aurora a3"></div>
+  <svg id="mountains" viewBox="0 0 1200 260" preserveAspectRatio="none">
+    <polygon points="0,260 0,160 150,60 300,150 420,90 600,180 760,70 900,160 1050,100 1200,180 1200,260" fill="#0d1730"/>
+    <polygon points="0,260 0,200 180,140 350,210 550,150 700,220 900,140 1080,210 1200,170 1200,260" fill="#08101f"/>
+  </svg>
+
+  <div class="card">
+    <div class="ask" id="ask">
+      <div class="eyebrow">a proposal, of sorts</div>
+      <h1>Tromsø, chasing the northern lights?</h1>
+      <p class="sub">just the two of us, under a sky doing something most people never see in person. the adventure of a lifetime — and it only feels that way because we'd be doing it together.</p>
+      <div class="buttons">
+        <button id="yes">yes, let's go</button>
+        <button id="no">no</button>
+      </div>
+      <div id="caption"></div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="eyebrow">it's happening</div>
+      <h1 id="resultTitle">Tromsø, here we come 🌌</h1>
+      <p class="sub" id="resultSub">i'll start looking at flights and thermal layers. you just have to show up and look up.</p>
+    </div>
+  </div>
+
+<script>
+  // stars
+  const sky = document.getElementById('sky');
+  for(let i=0;i<90;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2 + 0.6;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.top = Math.random()*70 + 'vh';
+    s.style.animationDuration = (2 + Math.random()*3) + 's';
+    sky.appendChild(s);
+  }
+
+  const noBtn = document.getElementById('no');
+  const yesBtn = document.getElementById('yes');
+  const caption = document.getElementById('caption');
+  const ask = document.getElementById('ask');
+  const result = document.getElementById('result');
+
+  const dodgeLines = [
+    "nope, try again",
+    "the aurora says yes though",
+    "keep trying 🙂",
+    "so close...",
+    "the lights are waiting",
+    "nice try though",
+    "getting warmer... for yes",
+    "ok now you're just chasing it",
+    "fine, one more try",
+    "it's basically begging you to click yes now"
+  ];
+
+  let dodgeCount = 0;
+  let yesScale = 1;
+
+  function moveNoButton(){
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
+    const margin = 20;
+    const maxX = window.innerWidth - btnW - margin;
+    const maxY = window.innerHeight - btnH - margin;
+
+    const x = Math.random() * (maxX - margin) + margin;
+    const y = Math.random() * (maxY - margin) + margin;
+
+    noBtn.style.left = x + 'px';
+    noBtn.style.top = y + 'px';
+  }
+
+  function shrinkNo(){
+    dodgeCount++;
+    const scale = Math.max(0.4, 1 - dodgeCount * 0.06);
+    noBtn.style.fontSize = (1 * scale) + 'rem';
+    noBtn.style.opacity = Math.max(0.35, 1 - dodgeCount * 0.07);
+
+    yesScale = Math.min(1.9, 1 + dodgeCount * 0.08);
+    yesBtn.style.fontSize = (1.1 * yesScale) + 'rem';
+    yesBtn.style.padding = (1 * yesScale) + 'rem ' + (2.2 * yesScale) + 'rem';
+
+    caption.textContent = dodgeLines[Math.min(dodgeCount - 1, dodgeLines.length - 1)];
+  }
+
+  noBtn.addEventListener('mouseenter', () => {
+    moveNoButton();
+    shrinkNo();
+  });
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    moveNoButton();
+    shrinkNo();
+  }, {passive:false});
+  noBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    moveNoButton();
+  });
+
+  function celebrate(){
+    for(let i=0;i<26;i++){
+      const p = document.createElement('div');
+      p.className = 'spark';
+      p.textContent = ['✨','🌌','❄️','💚'][Math.floor(Math.random()*4)];
+      p.style.left = Math.random()*100 + 'vw';
+      p.style.animationDuration = (2.5 + Math.random()*2) + 's';
+      p.style.fontSize = (1 + Math.random()*1.2) + 'rem';
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(), 5000);
+    }
+  }
+
+  yesBtn.addEventListener('click', () => {
+    ask.classList.add('hide');
+    setTimeout(() => {
+      ask.style.display = 'none';
+      result.classList.add('show');
+      celebrate();
+    }, 300);
+  });
+</script>
+
+</body>
+</html>
